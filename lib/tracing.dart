@@ -53,7 +53,8 @@ bool detectWTF(context) {
 /**
  * Create trace scope. Scopes must be strictly nested and are analogous to stack frames, but
  * do not have to follow the stack frames. Instead it is recommended that they follow logical
- * nesting.
+ * nesting. You may want to use [Event Signatures](http://google.github.io/tracing-framework/instrumenting-code.html#custom-events)
+ * as they are defined in WTF.
  */
 dynamic createScope(String signature, [flags]) {
   if (wtfEnabled) {
@@ -66,7 +67,7 @@ dynamic createScope(String signature, [flags]) {
 }
 
 /**
- * Used to mark scope entry.
+ * Used to mark scope entry. The return value is used to leave the scope.
  *
  *     final myScope = createScope('myMethod');
  *
@@ -88,7 +89,8 @@ dynamic enter(scope) {
 }
 
 /**
- * Used to mark scope entry which logs single argument.
+ * Used to mark scope entry which logs single argument. The return value is used
+ * to leave the scope again. Arguments only work if WTF has been enabled.
  */
 dynamic enter1(scope, arg1) {
   if (wtfEnabled) {
@@ -100,9 +102,9 @@ dynamic enter1(scope, arg1) {
 }
 
 /**
- * Used to mark scope exit.
+ * Used to mark scope exit. [scope] is the return value of a call to [enter].
  */
-dynamic leave(scope) {
+void leave(scope) {
   if (wtfEnabled) {
     _arg1[0] = scope;
     _leaveScope.apply(_arg1, thisArg: _trace);
@@ -112,9 +114,10 @@ dynamic leave(scope) {
 }
 
 /**
- * Used to mark scope exit with a value
+ * Used to mark scope exit with a value. [scope] is the return value of a call
+ * to [enter]. Return values only work if WTF has been enabled.
  */
-dynamic leaveVal(scope, returnValue) {
+void leaveVal(scope, returnValue) {
   if (wtfEnabled) {
     _arg2[0] = scope;
     _arg2[1] = returnValue;
@@ -126,7 +129,7 @@ dynamic leaveVal(scope, returnValue) {
 
 /**
  * Used to mark Async start. Async are similar to scope but they don't have to be strictly nested.
- * Async ranges only work if WTF has been enabled.
+ * The return value is used in the call to [endAsync]. Async ranges only work if WTF has been enabled.
  *
  *     someMethod() {
  *        var s = startAsync('HTTP:GET', 'some.url');
@@ -144,10 +147,14 @@ dynamic startAsync(String rangeType, String action) {
   return null;
 }
 
-dynamic endAsync(dynamic range) {
+/**
+ * Ends a async operation. [range] is the return value from [startAsync].
+ * Async ranges only work if WTF has been enabled.
+ */
+void endAsync(dynamic range) {
   if (wtfEnabled) {
     _arg1[0] = range;
-    return _endTimeRange.apply(_arg1, thisArg: _trace);
+    _endTimeRange.apply(_arg1, thisArg: _trace);
   }
   return null;
 }
