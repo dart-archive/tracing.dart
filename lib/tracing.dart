@@ -8,16 +8,20 @@ library angular.tracing;
 
 import "dart:profiler";
 
-bool wtfEnabled = false;
+bool _wtfEnabled = false;
 var _trace;
 var _events;
 var _createScope;
-var _enterScope;
 var _leaveScope;
 var _beginTimeRange;
 var _endTimeRange;
 final List _arg1 = [null];
 final List _arg2 = [null, null];
+
+/**
+ * Returns true after WTF support was enabled by a call to [detectWTF].
+ */
+bool get wtfEnabled => _wtfEnabled;
 
 /**
  * Use this method to detect if [WTF](http://google.github.io/tracing-framework/) has been enabled.
@@ -36,11 +40,10 @@ bool detectWTF(context) {
   if (context.hasProperty('wtf')) {
     var wtf = context['wtf'];
     if (wtf.hasProperty('trace')) {
-      wtfEnabled = true;
+      _wtfEnabled = true;
       _trace = wtf['trace'];
       _events = _trace['events'];
       _createScope = _events['createScope'];
-      _enterScope = _trace['enterScope'];
       _leaveScope = _trace['leaveScope'];
       _beginTimeRange = _trace['beginTimeRange'];
       _endTimeRange = _trace['endTimeRange'];
