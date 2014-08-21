@@ -78,6 +78,8 @@ dynamic createScope(String signature, [flags]) {
  *          leave(s);
  *        }
  *     }
+ *
+ * [executeInScope] helps with writing this boilerplate code.
  */
 dynamic enter(scope) {
   if (wtfEnabled) {
@@ -121,6 +123,42 @@ dynamic leaveVal(scope, returnValue) {
     _leaveScope.apply(_arg2, thisArg: _trace);
   } else {
     scope.makeCurrent();
+  }
+}
+
+/**
+ * Call [f] in the scope of [scope] by calling [enter] and [leave] in a finally
+ * block. The return value of [f] is forwarded.
+ *
+ *     executeInScope(() {
+ *       // Your code
+ *     }, scope);
+ */
+dynamic executeInScope(Function f, scope) {
+  final s = enter(scope);
+
+  try {
+    return f();
+  } finally {
+    leave(s);
+  }
+}
+
+/**
+ * Call [f] in the scope of [scope] by calling [enter1] with [arg1] and [leave]
+ * in a finally block. The return value of [f] is forwarded.
+ *
+ *     executeInScope(() {
+ *       // Your code
+ *     }, scope, 'Argument content');
+ */
+dynamic executeInScope1(Function f, scope, arg1) {
+  final s = enter1(scope, arg1);
+
+  try {
+    return f();
+  } finally {
+    leave(s);
   }
 }
 
