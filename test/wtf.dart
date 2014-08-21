@@ -12,11 +12,12 @@ main() {
   var _ElementText = createScope('Element#text');
   var _NodeAppend = createScope('Node#append()');
   var scope = enter(_main);
-  var s = enter(_querySelector);
-  BodyElement body = window.document.querySelector('body');
-  leave(s);
 
-  s = enter(_DivElement);
+  BodyElement body = executeInScope(() {
+    return window.document.querySelector('body');
+  }, _querySelector);
+
+  var s = enter(_DivElement);
   var div = new DivElement();
   leave(s);
 
