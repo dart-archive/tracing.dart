@@ -1,15 +1,17 @@
 library tracing.test;
 
-import '../lib/tracing.dart';
+import 'package:tracing/tracing.dart';
 import 'dart:html';
 import 'dart:js' show context;
 
 main() {
   detectWTF(context);
   var _main = createScope('main()');
+  var _mainCompleted = createInstance('main#Completed');
   var _querySelector = createScope('Node#querySelector()');
   var _DivElement = createScope('DivElement()');
   var _ElementText = createScope('Element#text');
+  var _ElementTextSet = createInstance('Element#setText(ascii text)');
   var _NodeAppend = createScope('Node#append()');
   var scope = enter(_main);
 
@@ -23,10 +25,13 @@ main() {
 
   s = enter(_ElementText);
   div.text = 'Hello WTF! (enabled: ${wtfEnabled})';
+  timeStamp1(_ElementTextSet, div.text);
   leave(s);
 
   s = enter(_NodeAppend);
   body.append(div);
   leave(s);
   leave(scope);
+
+  timeStamp(_mainCompleted);
 }
