@@ -1,0 +1,10 @@
+name: tracing
+version: 0.1.0
+authors:
+- Misko Hevery <misko@hevery.com>
+description: Profile Dart applications with Web Tracing Framework and Observatory
+homepage: https://github.com/angular/tracing.dart
+environment:
+  sdk: '>=1.4.0'
+dev_dependencies:
+  browser: '>=0.10.0+2 <0.11.0'
