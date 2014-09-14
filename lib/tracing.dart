@@ -12,6 +12,7 @@ bool _wtfEnabled = false;
 var _trace;
 var _events;
 var _createScope;
+var _createInstance;
 var _leaveScope;
 var _beginTimeRange;
 var _endTimeRange;
@@ -44,6 +45,7 @@ bool detectWTF(context) {
       _trace = wtf['trace'];
       _events = _trace['events'];
       _createScope = _events['createScope'];
+      _createInstance = _events['createInstance'];
       _leaveScope = _trace['leaveScope'];
       _beginTimeRange = _trace['beginTimeRange'];
       _endTimeRange = _trace['endTimeRange'];
@@ -52,6 +54,54 @@ bool detectWTF(context) {
   }
   return false;
 }
+
+/**
+ * Create trace instance. An instance is a single event. Use [timeStamp] to call
+ * a instance. Instances only work if WTF has been enabled.
+ */
+dynamic createInstance(String signature) {
+  if (wtfEnabled) {
+    _arg1[0] = signature;
+    return _createInstance.apply(_arg1, thisArg: _events);
+  }
+  return null;
+}
+
+/**
+ * Used to mark a single instance create by [createInstance].
+ *
+ *     final myInstance = createInstance('myEvent');
+ *
+ *     someMethod() {
+ *       timeStamp(myInstance);
+ *     }
+ */
+void timeStamp(instance) {
+  if (wtfEnabled) {
+    if (instance != null) {
+      instance.apply(const []);
+    }
+  }
+}
+
+/**
+ * Used to mark a single instance create by [createInstance] with one argument.
+ *
+ *     final myInstance = createInstance('myEvent(ascii text)');
+ *
+ *     someMethod() {
+ *       timeStamp1(myInstance, 'Argument content');
+ *     }
+ */
+void timeStamp1(instance, arg1) {
+  if (wtfEnabled) {
+    if (instance != null) {
+      _arg1[0] = arg1;
+      instance.apply(_arg1);
+    }
+  }
+}
+
 
 /**
  * Create trace scope. Scopes must be strictly nested and are analogous to stack frames, but
